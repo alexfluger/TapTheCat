@@ -5,6 +5,8 @@ module SNRGameEngine
 		private static instance: Game = new Game();
 		private currentScreen: Screen = null;
 		protected ctx: CanvasRenderingContext2D;
+		private screenW: number;
+		private screenH: number;
 		
 		constructor()
 		{
@@ -30,10 +32,20 @@ module SNRGameEngine
 			return this.currentScreen;
 		}
 		
+		getScreenHeight(): number
+		{
+			return this.screenH;
+		}
+		
+		getScreenWidth(): number
+		{
+			return this.screenW;
+		}
+		
 		attachCanvas(canvas: HTMLCanvasElement)
 		{
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+			canvas.width = this.screenW = window.innerWidth;
+			canvas.height = this.screenH = window.innerHeight;
 			this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
 		}
 		
@@ -110,8 +122,8 @@ module TapTheCat
 			var layer = new SNRGameEngine.Layer();
 			for (var x = 10; x < 100; x++) {
 				var box = new Box(
-					Math.floor(Math.random() * 1000),
-					Math.floor(Math.random() * 1000)
+					Math.floor(Math.random() * game.getScreenWidth()),
+					Math.floor(Math.random() * game.getScreenHeight())
 				);
 				layer.addNode(box);	
 			}

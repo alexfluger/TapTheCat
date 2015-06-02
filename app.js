@@ -25,9 +25,15 @@ var SNRGameEngine;
         Game.prototype.getScreen = function () {
             return this.currentScreen;
         };
+        Game.prototype.getScreenHeight = function () {
+            return this.screenH;
+        };
+        Game.prototype.getScreenWidth = function () {
+            return this.screenW;
+        };
         Game.prototype.attachCanvas = function (canvas) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas.width = this.screenW = window.innerWidth;
+            canvas.height = this.screenH = window.innerHeight;
             this.ctx = canvas.getContext("2d");
         };
         Game.prototype.run = function () {
@@ -91,9 +97,10 @@ var TapTheCat;
         __extends(DemoScreen, _super);
         function DemoScreen() {
             _super.call(this);
+            var game = SNRGameEngine.Game.getInstance();
             var layer = new SNRGameEngine.Layer();
             for (var x = 10; x < 100; x++) {
-                var box = new Box(Math.floor(Math.random() * 1000), Math.floor(Math.random() * 1000));
+                var box = new Box(Math.floor(Math.random() * game.getScreenWidth()), Math.floor(Math.random() * game.getScreenHeight()));
                 layer.addNode(box);
             }
             this.addLayer(layer);
