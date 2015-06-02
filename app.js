@@ -7,19 +7,33 @@ var __extends = this.__extends || function (d, b) {
 var SNRGameEngine;
 (function (SNRGameEngine) {
     var Game = (function () {
-        function Game(canvas) {
-            this.canvas = canvas;
+        function Game() {
             this.currentScreen = null;
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            this.ctx = canvas.getContext("2d");
+            if (Game.instance) {
+                throw "Use Game.getInstance()";
+            }
+            else {
+                Game.instance = this;
+            }
         }
+        Game.getInstance = function () {
+            return Game.instance;
+        };
         Game.prototype.setScreen = function (screen) {
             this.currentScreen = screen;
         };
         Game.prototype.getScreen = function () {
             return this.currentScreen;
         };
+        Game.prototype.attachCanvas = function (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            this.ctx = canvas.getContext("2d");
+        };
+        Game.prototype.run = function () {
+            this.getScreen().draw(this.ctx);
+        };
+        Game.instance = new Game();
         return Game;
     })();
     SNRGameEngine.Game = Game;
@@ -73,20 +87,6 @@ var SNRGameEngine;
 })(SNRGameEngine || (SNRGameEngine = {}));
 var TapTheCat;
 (function (TapTheCat) {
-    var Game = (function (_super) {
-        __extends(Game, _super);
-        function Game() {
-            _super.apply(this, arguments);
-        }
-        Game.prototype.load = function () {
-            this.setScreen(new DemoScreen());
-        };
-        Game.prototype.run = function () {
-            this.getScreen().draw(this.ctx);
-        };
-        return Game;
-    })(SNRGameEngine.Game);
-    TapTheCat.Game = Game;
     var DemoScreen = (function (_super) {
         __extends(DemoScreen, _super);
         function DemoScreen() {
@@ -100,6 +100,7 @@ var TapTheCat;
         }
         return DemoScreen;
     })(SNRGameEngine.Screen);
+    TapTheCat.DemoScreen = DemoScreen;
     var Box = (function (_super) {
         __extends(Box, _super);
         function Box() {
@@ -112,6 +113,7 @@ var TapTheCat;
         return Box;
     })(SNRGameEngine.Node);
 })(TapTheCat || (TapTheCat = {}));
-var game = new TapTheCat.Game(document.getElementById('gameCanvas'));
-game.load();
+var game = SNRGameEngine.Game.getInstance();
+game.attachCanvas(document.getElementById('gameCanvas'));
+game.setScreen(new TapTheCat.DemoScreen());
 game.run();

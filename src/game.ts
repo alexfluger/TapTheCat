@@ -2,16 +2,24 @@ module SNRGameEngine
 {
 	export class Game
 	{
-		protected ctx: CanvasRenderingContext2D;
+		private static instance: Game = new Game();
 		private currentScreen: Screen = null;
+		protected ctx: CanvasRenderingContext2D;
 		
-		constructor(private canvas: HTMLCanvasElement)
+		constructor()
 		{
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+			if (Game.instance) {
+				throw "Use Game.getInstance()";
+			} else {
+				Game.instance = this;
+			}
 		}
 		
+		public static getInstance(): Game
+		{
+			return Game.instance;
+		}
+
 		setScreen(screen: Screen): void
 		{
 			this.currentScreen = screen;
@@ -20,6 +28,18 @@ module SNRGameEngine
 		getScreen(): Screen
 		{
 			return this.currentScreen;
+		}
+		
+		attachCanvas(canvas: HTMLCanvasElement)
+		{
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+		}
+		
+		run(): void
+		{
+			this.getScreen().draw(this.ctx);
 		}
 	}
 	
@@ -83,21 +103,10 @@ module SNRGameEngine
 
 module TapTheCat
 {
-	export class Game extends SNRGameEngine.Game {
-		load(): void
-		{
-			this.setScreen(new DemoScreen());
-		}
-		
-		run(): void
-		{
-			this.getScreen().draw(this.ctx);
-		}
-	}
-	
-	class DemoScreen extends SNRGameEngine.Screen {
+	export class DemoScreen extends SNRGameEngine.Screen {
 		constructor() {
 			super();
+			var game = SNRGameEngine.Game.getInstance();
 			var layer = new SNRGameEngine.Layer();
 			for (var x = 10; x < 100; x++) {
 				var box = new Box(
@@ -119,6 +128,7 @@ module TapTheCat
 	}
 }
 
-var game = new TapTheCat.Game(<HTMLCanvasElement>document.getElementById('gameCanvas'));
-game.load();
+var game = SNRGameEngine.Game.getInstance();
+game.attachCanvas(<HTMLCanvasElement>document.getElementById('gameCanvas'));
+game.setScreen(new TapTheCat.DemoScreen());
 game.run();
